@@ -1,0 +1,42 @@
+{
+    "indexes": [
+        {
+            "collectionGroup": "embeddings",
+            "queryScope": "COLLECTION_GROUP",
+            "fields": [
+                {
+                    "fieldPath": "user_id",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "embeddings",
+            "queryScope": "COLLECTION_GROUP",
+            "fields": [
+                {
+                    "fieldPath": "user_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "purchase_date",
+                    "order": "ASCENDING"
+                }
+            ]
+        },
+        {
+            "collectionGroup": "embeddings",
+            "queryScope": "COLLECTION_GROUP",
+            "fields": [
+                {
+                    "fieldPath": "user_id",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "category_name",
+                    "order": "ASCENDING"
+                }
+            ]
+        }
+    ]
+}
