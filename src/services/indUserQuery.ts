@@ -1,4 +1,4 @@
-import { embed } from '../lib/embed-vertex';
+
 import { db } from '../lib/firebase-admin';
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);

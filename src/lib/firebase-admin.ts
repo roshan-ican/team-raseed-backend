@@ -7,14 +7,14 @@ let initialized = false;
 
 async function initializeFirebase() {
   if (initialized) return db;
-  
+
   if (!admin.apps.length) {
     const credentials = await loadConfigFromBucket();
-    console.log(credentials, "backend");
-    
+    // console.log(credentials, "backend");
+
     // 🔍 Debug: Log the project ID from credentials
     console.log('🔍 Project ID from credentials:', credentials.project_id);
-    
+
     admin.initializeApp({
       credential: admin.credential.cert(credentials as admin.ServiceAccount),
       // 🔍 Explicitly set project ID if needed
@@ -23,10 +23,10 @@ async function initializeFirebase() {
   }
 
   db = admin.firestore();
-  
+
   // ✅ MUST call settings() BEFORE any other operations
   db.settings({ ignoreUndefinedProperties: true });
-  
+
   // 🔍 Debug: Test basic connectivity (AFTER settings)
   try {
     console.log('🔍 Testing Firestore connectivity...');
@@ -34,7 +34,7 @@ async function initializeFirebase() {
     console.log('✅ Firestore connection successful');
   } catch (error: any) {
     console.error('❌ Firestore connection failed:', error.message);
-    
+
     // Check if it's a permissions issue
     if (error.code === 7) {
       console.error('🚫 PERMISSION_DENIED: Check service account roles');
@@ -42,7 +42,7 @@ async function initializeFirebase() {
       console.error('🔍 NOT_FOUND: Project or database might not exist');
     }
   }
-  
+
   initialized = true;
   return db;
 }
