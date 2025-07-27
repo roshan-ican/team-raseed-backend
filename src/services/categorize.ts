@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
-import credentials from "../config/credentials.json";
+
 import {
   RECEIPT_CATEGORIZATION_PROMPT_V2,
 } from "../constants/prompts";
