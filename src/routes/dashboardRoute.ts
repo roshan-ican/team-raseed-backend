@@ -14,6 +14,8 @@ export default async function DashBoardRoute(app: FastifyInstance) {
         userId = "",
       } = req.query as any;
 
+      
+
       console.log(req.query);
       // const userId = req.user.id; // From authentication middleware
       // const userId = "jagrutihota92@gmail.com";

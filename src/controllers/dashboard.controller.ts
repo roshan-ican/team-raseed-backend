@@ -112,13 +112,13 @@ export async function getDashboardData(
   let receiptQuery = query(
     receiptsRef,
     where("userId", "==", userId),
-    orderBy("createdAt", "desc")
+    orderBy("created_at", "desc")
   );
 
   if (startDate) {
     receiptQuery = query(
       receiptQuery,
-      where("createdAt", ">=", Timestamp.fromDate(startDate))
+      where("created_at", ">=", Timestamp.fromDate(startDate))
     );
   }
 
@@ -133,16 +133,16 @@ export async function getDashboardData(
       amount: Number(data.amount) || 0,
       items: Array.isArray(data.items)
         ? data.items.map((item) => ({
-            name: item.name || "",
-            price: Number(item.price) || 0,
-            quantity: item.quantity ?? 1,
-            category_name: item.category_name || "Uncategorized",
-          }))
+          name: item.name || "",
+          price: Number(item.price) || 0,
+          quantity: item.quantity ?? 1,
+          category_name: item.category_name || "Uncategorized",
+        }))
         : [],
       notes: data.notes || "",
       confidence: Number(data.confidence) || 0,
       userId: data.userId || "",
-      createdAt: data.createdAt || null,
+      createdAt: data.created_at || null,
       processingStatus: data.processingStatus || "processed",
     };
   });
@@ -150,8 +150,8 @@ export async function getDashboardData(
   // Filter by category_name if given
   const filteredReceipts = selectedCategory
     ? allReceipts.filter((r) =>
-        r.items.some((item) => item.category_name === selectedCategory)
-      )
+      r.items.some((item) => item.category_name === selectedCategory)
+    )
     : allReceipts;
 
   // METRICS

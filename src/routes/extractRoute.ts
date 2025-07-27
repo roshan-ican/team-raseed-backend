@@ -12,6 +12,7 @@ import { receiptExtractionResponseStringify } from "../constants/catergorizeStru
 import { db } from "../lib/firebase-admin";
 import { doc, Firestore, serverTimestamp, setDoc } from "firebase/firestore";
 import { extractReceiptData } from "../utils/documentAIExtraction";
+import { validateImageFile, validateReceiptWithSmartDetection } from "../services/smartReciptValidation";
 
 
 // NPM-provided ffmpeg & ffprobe
@@ -78,6 +79,8 @@ async function safeUnlink(p?: string | null) {
 
 
 
+
+
 export default async function extractRoutes(app: FastifyInstance) {
   app.post(
     "/upload-extract",
@@ -116,6 +119,35 @@ export default async function extractRoutes(app: FastifyInstance) {
 
         if (!fileBuffer || !filename) {
           return reply.status(400).send({ error: "No file uploaded" });
+        }
+
+        // 🔍 VALIDATE RECEIPT BEFORE PROCESSING
+        console.log('🔍 Validating uploaded file...');
+
+        // For videos, we'll validate after frame extraction
+        // For images, validate immediately
+        if (!isVideo) {
+          // Basic file validation
+          const fileValidation = validateImageFile(fileBuffer);
+          if (!fileValidation.isValid) {
+            return reply.status(400).send({
+              error: fileValidation.message,
+              code: 'INVALID_FILE'
+            });
+          }
+
+          // Smart AI validation
+          const receiptValidation = await validateReceiptWithSmartDetection(fileBuffer);
+          if (!receiptValidation.isValid) {
+            console.log('❌ Image validation failed:', receiptValidation.message);
+            return reply.status(400).send({
+              error: receiptValidation.message,
+              code: 'NOT_A_RECEIPT',
+              details: receiptValidation.analysis
+            });
+          }
+
+          console.log('✅ Image validation passed!');
         }
 
         let ocrBuffer: Buffer;
@@ -164,7 +196,24 @@ export default async function extractRoutes(app: FastifyInstance) {
           }
 
           ocrBuffer = await fs.promises.readFile(framePath);
+
+          // 🔍 VALIDATE VIDEO FRAME AFTER EXTRACTION
+          console.log('🔍 Validating extracted video frame...');
+          const frameValidation = await validateReceiptWithSmartDetection(ocrBuffer);
+          if (!frameValidation.isValid) {
+            console.log('❌ Video frame validation failed:', frameValidation.message);
+            await safeUnlink(framePath);
+            await safeUnlink(storedVideoPath);
+            return reply.status(400).send({
+              error: `Video frame validation failed: ${frameValidation.message}`,
+              code: 'VIDEO_NOT_RECEIPT',
+              details: frameValidation.analysis
+            });
+          }
+
+          console.log('✅ Video frame validation passed!');
           await safeUnlink(framePath);
+
           videoMeta = {
             originalFilename: filename,
             storedName,
@@ -176,9 +225,10 @@ export default async function extractRoutes(app: FastifyInstance) {
           ocrBuffer = fileBuffer;
         }
 
+        // 🚀 PROCEED WITH OCR ONLY AFTER VALIDATION
+        console.log('🚀 Starting OCR processing...');
         const rawText = await extractReceiptData(ocrBuffer, filename);
         const categorization = await categorize((rawText as string) || "", userId);
-
 
         let parsedData = extractJsonFromResponse(categorization as string) || {
           receipt: {},
@@ -186,7 +236,7 @@ export default async function extractRoutes(app: FastifyInstance) {
           items: {},
         };
 
-        console.log(parsedData, "__parsed_Data")
+        console.log(parsedData, "__parsed_Data");
 
         // await storeReceiptData(parsedData);
         const responseData = {
@@ -198,11 +248,11 @@ export default async function extractRoutes(app: FastifyInstance) {
           // documentId,
           processingStatus: "processed" as const,
         };
-        console.log(responseData, "__respine dae")
+        console.log(responseData, "__response_data");
 
         reply.type("application/json");
-        // return reply.send(receiptExtractionResponseStringify(responseData));
         return reply.send(responseData);
+
       } catch (err: any) {
         request.log.error({ err }, "Upload / OCR failed");
         return reply.status(500).send({
@@ -216,7 +266,6 @@ export default async function extractRoutes(app: FastifyInstance) {
     }
   );
 }
-
 
 // Helper function to clean undefined values
 
