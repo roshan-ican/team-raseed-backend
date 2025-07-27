@@ -23,6 +23,7 @@ export default function saveReceipts(app: FastifyInstance) {
         vendor: string;
         date: string;
         amount: number;
+        taxAmount?: number;
         category: string;
         items: { name: string; price: number; quantity: number }[];
         notes?: string;
@@ -51,6 +52,7 @@ export default function saveReceipts(app: FastifyInstance) {
         vendor: editedCategorization.vendor,
         date: timestampedDate,
         amount: editedCategorization.amount,
+        taxAmount: editedCategorization.taxAmount,
         category_name: editedCategorization.category,
         items: editedCategorization.items,
         notes: editedCategorization.notes || "",
@@ -95,6 +97,7 @@ export default function saveReceipts(app: FastifyInstance) {
       const dataOnPass = {
         receiptId,
         amount: cleanedData.amount,
+        taxAmount: cleanedData.taxAmount,
         totalItems: cleanedData.items.length,
         date: editedCategorization.date,
         vendor: editedCategorization.vendor,
