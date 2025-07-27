@@ -19,8 +19,9 @@ app.register(cookie, {
 });
 
 app.register(cors, {
-  origin: "http://localhost:3000",
+  origin: ["https://team-raseed-frontend.vercel.app","http://localhost:3000"],
   credentials: true,
+  methods:['post','get','options']
 });
 
 app.register(require("@fastify/swagger"), {
