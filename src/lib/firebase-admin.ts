@@ -1,21 +1,7 @@
-// // src/lib/firebase-admin.ts
 
-// import admin from "firebase-admin";
-// import serviceAccount from "../config/serviceAccountKey.json";
-
-// if (!admin.apps.length) {
-//   admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-//   });
-// }
-
-// export { admin };
-
-
-// src/lib/firebase-admin.ts
 import admin from "firebase-admin";
-import serviceAccount from "../config/raseed-app.json";
 
+const serviceAccount = process.env.FIRE_BASE_CONFIGURATION_PATH!
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
