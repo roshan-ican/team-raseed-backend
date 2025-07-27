@@ -1,11 +1,17 @@
-// src/config/documentAIClient.ts
 import { DocumentProcessorServiceClient } from '@google-cloud/documentai';
+import { loadCredentialsFromBucket } from '../utils/bucket-config';
 
-// ✅ Much simpler approach
-const client = new DocumentProcessorServiceClient({
-  projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-  keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE, // Direct path to Google Cloud service account
-});
+
+let client: DocumentProcessorServiceClient;
+
+async function initializeClient() {
+  const credentials = await loadCredentialsFromBucket();
+  // console.log((credentials), "credentials___")
+  client = new DocumentProcessorServiceClient({
+    credentials
+  });
+}
+
+initializeClient().catch(console.error);
 
 export { client };
-export default client;

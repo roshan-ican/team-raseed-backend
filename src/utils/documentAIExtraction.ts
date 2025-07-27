@@ -1,6 +1,5 @@
-// src/utils/simpleDocumentAI.ts
+import { client } from "../config/documentAiClient";
 
-import client from "../config/documentAiClient";
 
 
 export async function extractReceiptData(

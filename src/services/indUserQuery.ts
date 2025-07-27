@@ -152,6 +152,7 @@ export async function fixedVectorSearch(
       console.log(`🔄 Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(receiptDocs.length / batchSize)}`);
 
       // Process batch in parallel
+      // @ts-ignore
       const batchPromises = batch.map(async (receiptDoc) => {
         try {
           const embeddingsSnap = await receiptDoc.ref.collection('embeddings').get();
@@ -162,6 +163,7 @@ export async function fixedVectorSearch(
           }
 
           console.log(`📊 Found ${embeddingsSnap.size} embeddings in receipt: ${receiptDoc.id}`);
+          // @ts-ignore
 
           return embeddingsSnap.docs.map(doc => {
             const data = doc.data() as EmbeddingDoc;
@@ -196,6 +198,8 @@ export async function fixedVectorSearch(
               similarity,
               distance
             } as SearchHit;
+            // @ts-ignore
+
           }).filter(item => item !== null) as SearchHit[];
 
         } catch (error) {
@@ -385,11 +389,11 @@ export async function enhancedDebugDataStructure(uid: string) {
   console.log(`=== ENHANCED DEBUGGING FOR USER: ${uid} ===`);
 
   try {
-    const receiptsQuery = db.collection('receipts').where('userId', '==', uid);
+    const receiptsQuery = db?.collection('receipts').where('userId', '==', uid);
     const receiptsSnapshot = await receiptsQuery.get();
     console.log(`📄 Found ${receiptsSnapshot.size} receipts`);
 
-    let totalEmbeddings = 0;
+    let totalEmbeddings = 0;  
     let validEmbeddings = 0;
     const categories = new Set<string>();
     const vendors = new Set<string>();
@@ -398,7 +402,7 @@ export async function enhancedDebugDataStructure(uid: string) {
       const embeddingsSnap = await receiptDoc.ref.collection('embeddings').get();
       totalEmbeddings += embeddingsSnap.size;
 
-      embeddingsSnap.docs.forEach(doc => {
+      embeddingsSnap.docs.forEach((doc: { data: () => any; }) => {
         const data = doc.data();
         if (data.embedding && data.embedding.length > 0) {
           validEmbeddings++;
