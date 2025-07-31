@@ -69,3 +69,9 @@ The following are the main API endpoints available:
 *   **Other:**
     *   [FFmpeg](https://ffmpeg.org/) for video processing
     *   [ElevenLabs](https://elevenlabs.io/) for text-to-speech
+
+Live preview
+
+
+https://github.com/user-attachments/assets/f8d0ca15-6ec2-4743-86dc-41ed220b6601
+
